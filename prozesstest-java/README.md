@@ -209,13 +209,14 @@ Darunter steht `Tests run: 4, Failures: 0, Errors: 1, Skipped: 0`. Danach wie na
 
 ## Modellkopien nachziehen
 
-Ändert sich ein Modell unter `prozess/` oder die Entwickler-Fassung unter `loesung/`, kopiert ihr es im Repo-Root neu nach `src/main/resources/`, im Startstand, in der Musterlösung und in der JGiven-Demo unter `loesung/prozesstest-jgiven/`. Die Klassen mit den IDs zieht ihr nicht nach, der nächste Lauf erzeugt sie aus den neuen Kopien:
+Ändert sich ein Modell unter `prozess/` oder die Entwickler-Fassung unter `loesung/`, kopiert ihr es im Repo-Root neu nach `src/main/resources/`, im Startstand, in der Musterlösung, in der JGiven-Demo unter `loesung/prozesstest-jgiven/` und in der Scenario-Demo unter `loesung/prozesstest-scenario/`. Die Klassen mit den IDs zieht ihr nicht nach, der nächste Lauf erzeugt sie aus den neuen Kopien:
 
 ```bash
 cp loesung/genehmigungsworkflow-entwickler.bpmn prozesstest-java/src/main/resources/genehmigungsworkflow.bpmn
 cp loesung/genehmigungsworkflow-entwickler.bpmn loesung/prozesstest-java/src/main/resources/genehmigungsworkflow.bpmn
 cp prozess/genehmigungsworkflow.bpmn loesung/prozesstest-java/src/main/resources/genehmigungsworkflow-tag1.bpmn
 cp prozess/genehmigungsworkflow.bpmn loesung/prozesstest-jgiven/src/main/resources/genehmigungsworkflow-tag1.bpmn
+cp prozess/genehmigungsworkflow.bpmn loesung/prozesstest-scenario/src/main/resources/genehmigungsworkflow-tag1.bpmn
 cp prozess/varianten/verbuchen-fehlerpfad.bpmn prozesstest-java/src/main/resources/
 cp prozess/varianten/verbuchen-fehlerpfad.bpmn loesung/prozesstest-java/src/main/resources/
 ```

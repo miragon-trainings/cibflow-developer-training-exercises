@@ -1,6 +1,6 @@
 # Musterlösung zu Übung 8 und 9
 
-Für Übung 8 das umgebaute Modell `genehmigungsworkflow-entwickler.bpmn`. Für Übung 9 die fertigen Prozesstests in Java unter `prozesstest-java/`, ein vollständiges Projekt mit demselben Aufbau wie der Startstand: Ihr baut und testet es hier, ohne etwas über euren Stand zu kopieren. Unter `element-template/` liegt das Element Template, das euren Worker zum Baustein macht. Den Worker in C# bekommt ihr fertig unter `worker/` im Repo-Root, unter `worker-hexagonal/` liegt er noch einmal, nach Ports und Adaptern geschnitten, zum Lesen und Vergleichen. Unter `prozesstest-jgiven/` liegt der Ausblick aus Kapitel 10, kein Teil einer Übung.
+Für Übung 8 das umgebaute Modell `genehmigungsworkflow-entwickler.bpmn`. Für Übung 9 die fertigen Prozesstests in Java unter `prozesstest-java/`, ein vollständiges Projekt mit demselben Aufbau wie der Startstand: Ihr baut und testet es hier, ohne etwas über euren Stand zu kopieren. Unter `element-template/` liegt das Element Template, das euren Worker zum Baustein macht. Den Worker in C# bekommt ihr fertig unter `worker/` im Repo-Root, unter `worker-hexagonal/` liegt er noch einmal, nach Ports und Adaptern geschnitten, zum Lesen und Vergleichen. Unter `prozesstest-jgiven/` und `prozesstest-scenario/` liegen die beiden Ausblicke aus Kapitel 10, keiner davon ist Teil einer Übung.
 
 ## Lösung von Übung 8
 
@@ -75,3 +75,16 @@ cd loesung/prozesstest-jgiven
 ```
 
 Den Abdeckungsbericht schreibt schon der Testlauf, unter `target/process-test-coverage/`. Was die Szenarien zeigen, wie sie aufgebaut sind und wie viel der erste Lauf lädt, steht in [prozesstest-jgiven/README.md](prozesstest-jgiven/README.md). Für Trainer: Die GitHub Action prüft, dass die Modellkopie `prozesstest-jgiven/src/main/resources/genehmigungsworkflow-tag1.bpmn` byte-gleich zu `prozess/genehmigungsworkflow.bpmn` bleibt und beide Szenarien grün sind.
+
+## Scenario-Demo (Ausblick in Kapitel 10)
+
+`prozesstest-scenario/` zeigt denselben Prozesstest als Szenario mit der Community-Extension [CIB seven Platform Scenario](https://github.com/cibseven-community-hub/cibseven-platform-scenario): genehmigt, abgelehnt, Nachbesserung und Timer am selben Modell ohne External Task, mit derselben Engine im Speicher. Der Test legt einmal fest, was an jeder Aufgabe passiert, die der Antrag erreicht, dann läuft er von selbst bis zum Ende. Speicherpunkte und Timer führt der Runner selbst aus, für den Timer stellt er die Uhr der Engine vor. Kein Teil einer Übung, ein eigenes Projekt: `prozesstest-java/` lädt die Bibliothek nicht.
+
+Vom Repo-Root aus:
+
+```bash
+cd loesung/prozesstest-scenario
+./mvnw test              # 4 Szenarien, in PowerShell: .\mvnw.cmd test
+```
+
+Den Abdeckungsbericht schreibt der Testlauf, unter `target/process-test-coverage/`. Wie ein Szenario aussieht, was anders ist als im klassischen Test und in JGiven und wie viel der erste Lauf lädt, steht in [prozesstest-scenario/README.md](prozesstest-scenario/README.md). Für Trainer: Die GitHub Action prüft, dass die Modellkopie `prozesstest-scenario/src/main/resources/genehmigungsworkflow-tag1.bpmn` byte-gleich zu `prozess/genehmigungsworkflow.bpmn` bleibt und alle vier Szenarien grün sind.

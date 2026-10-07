@@ -24,6 +24,9 @@
 #                       ist der Startstand unter prozess/, die zwei Szenarien mit JGiven laufen grün, keins übersprungen,
 #                       das JSON für den Bericht von JGiven und der Abdeckungsbericht liegen da. Den HTML-Bericht von
 #                       JGiven (./mvnw jgiven:report) baut der Job nicht.
+#   java-scenario       Der zweite Ausblick in Kapitel 10 unter loesung/prozesstest-scenario/, ein eigenes Projekt: Die
+#                       Modellkopie ist der Startstand unter prozess/, die vier Szenarien mit CIB seven Platform Scenario
+#                       laufen grün, keins übersprungen, der Abdeckungsbericht liegt da.
 #                       Die Java-Jobs brauchen weder Docker noch Zugangsdaten, die Engine läuft im Speicher.
 #
 # Warum die CI gegen reines CIB seven läuft und nicht gegen den CIB flow Stack aus stack/:
@@ -484,6 +487,59 @@ jobs:
             exit 1
           fi
           abdeckung=target/process-test-coverage/io.miragon.schulung.genehmigung.GenehmigungsworkflowSzenarioTest/report.html
+          if [ ! -s "$abdeckung" ]; then
+            echo "::error::Der Abdeckungsbericht $abdeckung fehlt"
+            exit 1
+          fi
+
+  java-scenario:
+    name: Scenario-Demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: loesung/prozesstest-scenario
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Modellkopie ist der Startstand
+        run: |
+          # Die Szenarien testen dasselbe Modell wie die Demo in loesung/prozesstest-java: das fertige Modell nach Übung 7
+          kopie=src/main/resources/genehmigungsworkflow-tag1.bpmn
+          if ! cmp -s "$kopie" ../../prozess/genehmigungsworkflow.bpmn; then
+            echo "::error::loesung/prozesstest-scenario/$kopie weicht von prozess/genehmigungsworkflow.bpmn ab. Nach einer Änderung am Startstand: cp prozess/genehmigungsworkflow.bpmn loesung/prozesstest-scenario/$kopie, nach einem Ausprobieren: git restore loesung/prozesstest-scenario"
+            exit 1
+          fi
+
+      - name: JDK 21 einrichten
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: loesung/prozesstest-scenario/pom.xml
+
+      - name: Szenarien ausführen (Engine im Speicher)
+        run: ./mvnw -B -ntp test
+
+      - name: Vier Szenarien grün, keins übersprungen, Abdeckungsbericht da
+        run: |
+          # Überspringen ist für Maven kein Fehler, hier schon. Die Zahl fällt auf, wenn ein Szenario dazukommt oder
+          # wegfällt, ohne dass das README mitzieht. Den Abdeckungsbericht schreibt die ProcessEngineCoverageExtension,
+          # mit der die Testklasse die Engine einbindet.
+          bericht=target/surefire-reports/TEST-io.miragon.schulung.genehmigung.GenehmigungsworkflowScenarioTest.xml
+          kopf=$(grep -o '<testsuite [^>]*>' "$bericht")
+          echo "$kopf"
+          for erwartet in 'tests="4"' 'skipped="0"' 'failures="0"' 'errors="0"'; do
+            case "$kopf" in
+              *"$erwartet"*) ;;
+              *) echo "::error::Erwartet: 4 Szenarien grün, keins übersprungen. Abweichung bei $erwartet"; exit 1 ;;
+            esac
+          done
+          abdeckung=target/process-test-coverage/io.miragon.schulung.genehmigung.GenehmigungsworkflowScenarioTest/report.html
           if [ ! -s "$abdeckung" ]; then
             echo "::error::Der Abdeckungsbericht $abdeckung fehlt"
             exit 1
