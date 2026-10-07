@@ -2,7 +2,7 @@
 // Die Engine ist kein Adapter, sie ist das externe System. Dieser Adapter steht zwischen ihr und dem Kern
 // und übersetzt an der Grenze: Variablen des External Tasks rein, Genehmigung zum Kern, Buchungsnummer
 // als Variable zurück. Nur hier stehen die Variablennamen des Modells (antragsteller, betrag, begruendung,
-// buchungsnummer). In loesung/worker macht das der Handler, dort zusammen mit dem Aufruf des Fachsystems.
+// buchungsnummer). In worker/ macht das der Handler, dort zusammen mit dem Aufruf des Fachsystems.
 using System.Globalization;
 using GenehmigungWorker.Domaene;
 using GenehmigungWorker.Domaene.Ports;
@@ -20,7 +20,7 @@ public class GenehmigungVerbuchenAdapter(IGenehmigungVerbuchen useCase)
     public Dictionary<string, object> Handle(ExternalTask task)
     {
         // Übersetzen: Aus den Variablen der Engine wird ein Domänenobjekt.
-        // Idempotenz-Schlüssel wie in loesung/worker: Business Key, wenn die Instanz einen hat, sonst die
+        // Idempotenz-Schlüssel wie in worker/: Business Key, wenn die Instanz einen hat, sonst die
         // Prozessinstanz-ID. Über das Startformular gestartet ist BusinessKey meist null.
         // Fehlt eine Variable, scheitert der Adapter laut mit KeyNotFoundException, die Schleife meldet failure.
         // Danach den Kern rufen, nur über den eingehenden Port, und das Ergebnis zurückübersetzen:

@@ -55,7 +55,8 @@ public class BuchungssystemSimulation : IBuchungssystem
         }
 
         // Über dem Budget lehnt das Fachsystem ab: nichts speichern, keine Nummer.
-        // Die Schleife meldet bpmnError, im Modell geht es bei "Buchung klären" weiter.
+        // Die Schleife meldet bpmnError. In der Variante prozess/varianten/verbuchen-fehlerpfad.bpmn geht es
+        // bei "Buchung klären" weiter, ohne Error-Boundary im Modell endet die Instanz still (siehe Program.cs).
         if (betrag > BudgetJeBuchung)
         {
             throw new BuchungAbgelehntException(

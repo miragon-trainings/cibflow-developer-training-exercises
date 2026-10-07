@@ -12,6 +12,7 @@
 #                       aus worker/: erst der Startstand (fertiges Modell nach Übung 7, nur User Tasks), dann wie in
 #                       Übung 8 die Entwickler-Fassung mit External Task. Danach Smoke-Test und die Prozesstests gegen
 #                       die Engine, erst der Prozesstest in C# unter worker/, dann die der hexagonalen Fassung.
+#                       Zuletzt läuft der fertige Worker selbst und verbucht einen Antrag, einen zweiten lehnt er ab.
 #   java-startstand     Der Prozesstest in Java unter prozesstest-java/: Die Modellkopien sind byte-gleich zur
 #                       Entwickler-Fassung und zur Variante, der Happy Path läuft grün, die drei TODO-Tests sind
 #                       übersprungen, nicht rot. Dazu: Die Modellkopie der Demo in Kapitel 10 ist der Startstand.
@@ -93,7 +94,7 @@ jobs:
 
       - name: Element Template passt zum Modell
         run: |
-          # Bonus "Euer Worker als Baustein" in Übung 9: Die Vorlage muss gültiges JSON sein und an Task_Verbuchen
+          # "Euer Worker als Baustein" in Übung 9: Die Vorlage muss gültiges JSON sein und an Task_Verbuchen
           # der Entwickler-Fassung genau das setzen, was dort steht: Elementtyp, camunda:type und Topic.
           # Weicht das Topic ab, holt der Worker nach dem Anwenden der Vorlage keinen Task mehr.
           python3 - <<'PY'
@@ -224,7 +225,18 @@ jobs:
         env:
           EngineBenutzer: worker
           EnginePasswort: worker
-        run: dotnet test worker/GenehmigungWorker.sln --no-build --filter "Kategorie=Prozesstest" --logger "console;verbosity=normal"
+        run: |
+          dotnet test worker/GenehmigungWorker.sln --no-build --filter "Kategorie=Prozesstest" --logger "console;verbosity=normal" \
+            --logger "trx;LogFileName=prozesstest.trx" --results-directory "$RUNNER_TEMP/worker-tests"
+          # Findet der Filter keinen Test, etwa nach einem umbenannten Trait, endet dotnet test trotzdem mit Exit-Code 0
+          zaehler=$(grep -o '<Counters [^>]*>' "$RUNNER_TEMP/worker-tests/prozesstest.trx")
+          echo "$zaehler"
+          for erwartet in 'total="2"' 'passed="2"'; do
+            case "$zaehler" in
+              *"$erwartet"*) ;;
+              *) echo "::error::Erwartet: 2 Prozesstests in C# bestanden, Happy Path und Gegenprobe. Abweichung bei $erwartet"; exit 1 ;;
+            esac
+          done
 
       - name: Hexagonale Fassung, Prozesstests gegen dieselbe Engine
         env:
@@ -233,6 +245,64 @@ jobs:
         # Dieselben Fälle über Adapter und Use Case statt Handler, dazu der Fehlerpfad:
         # Die Variante mit Error-Boundary deployt FehlerpfadTests selbst.
         run: dotnet test loesung/worker-hexagonal/GenehmigungWorker.sln --no-build --filter "Kategorie=Prozesstest" --logger "console;verbosity=normal"
+
+      - name: Fertiger Worker verbucht, wie ab Übung 8
+        env:
+          EngineBenutzer: worker
+          EnginePasswort: worker
+        run: |
+          # Der Prozesstest in C# ruft den Handler mit einem Fake. Hier läuft der Worker selbst, wie ab Übung 8 bei allen:
+          # Schleife, Simulation, complete und bpmnError gegen die Engine. 1.200 Euro enden bei "Antrag genehmigt" mit
+          # buchungsnummer, 60.000 Euro lehnt die Simulation ab, die Variante mit Error-Boundary führt zu "Buchung klären".
+          set -euo pipefail
+          api=http://localhost:8080/engine-rest
+          rest() { # benutzer methode pfad [json]
+            if [ $# -ge 4 ]; then
+              curl -fsS --max-time 30 -u "$1:$1" -X "$2" -H 'Content-Type: application/json' --data "$4" "$api$3"
+            else
+              curl -fsS --max-time 30 -u "$1:$1" -X "$2" "$api$3"
+            fi
+          }
+          # Fragt bis zu 60 Sekunden lang, bis der jq-Ausdruck auf die Antwort einen Wert liefert, und gibt ihn aus
+          warte_auf() { # beschreibung benutzer pfad jq-ausdruck
+            local wert
+            for _ in $(seq 1 60); do
+              wert=$(rest "$2" GET "$3" | jq -r "$4 // empty") || wert=""
+              if [ -n "$wert" ]; then echo "$wert"; return 0; fi
+              sleep 1
+            done
+            echo "::error::$1: nach 60 Sekunden nicht erreicht" >&2
+            return 1
+          }
+
+          dotnet worker/src/GenehmigungWorker/bin/Debug/net10.0/GenehmigungWorker.dll > worker.log 2>&1 &
+          worker=$!
+          trap 'kill "$worker" 2>/dev/null || true; echo "Log des Workers:"; cat worker.log' EXIT
+
+          echo "Genehmigt: als anna starten, als gerda genehmigen, der Worker verbucht"
+          pi=$(rest anna POST /process-definition/key/Process_Genehmigung/start \
+            '{"variables":{"betrag":{"value":1200,"type":"Long"},"begruendung":{"value":"Fertiger Worker in der CI","type":"String"}}}' | jq -r .id)
+          task=$(warte_auf '"Antrag prüfen" bei gerda' gerda "/task?processInstanceId=$pi&taskDefinitionKey=Task_Pruefen" '.[0].id')
+          rest gerda POST "/task/$task/complete" '{"variables":{"entscheidung":{"value":"genehmigt","type":"String"}}}'
+          warte_auf 'Instanz beendet' worker "/history/process-instance/$pi" 'select(.state == "COMPLETED") | .id' > /dev/null
+          warte_auf 'Ende "Antrag genehmigt"' worker "/history/activity-instance?processInstanceId=$pi&activityId=End_Genehmigt" '.[0].id' > /dev/null
+          nummer=$(warte_auf buchungsnummer worker "/history/variable-instance?processInstanceId=$pi&variableName=buchungsnummer" '.[0].value')
+          echo "buchungsnummer = $nummer"
+          if ! [[ "$nummer" =~ ^B-[0-9]{4}-[0-9]{4}$ ]] || ! grep -qF "Verbucht: $nummer für anna" worker.log; then
+            echo "::error::Erwartet: buchungsnummer B-<Jahr>-<Nummer> aus der Simulation und \"Verbucht: $nummer für anna\" im Log"
+            exit 1
+          fi
+
+          echo "Abgelehnt: Variante deployen, 60.000 Euro starten, der Worker meldet bpmnError"
+          dotnet run --project worker/src/GenehmigungWorker --no-build -- deploy prozess/varianten/verbuchen-fehlerpfad.bpmn
+          pi=$(rest anna POST /process-definition/key/Process_VerbuchenFehlerpfad/start \
+            '{"variables":{"antragsteller":{"value":"anna","type":"String"},"betrag":{"value":60000,"type":"Long"},"begruendung":{"value":"Fertiger Worker in der CI","type":"String"}}}' | jq -r .id)
+          warte_auf '"Buchung klären" bei gerda' gerda "/task?processInstanceId=$pi&taskDefinitionKey=Task_BuchungKlaeren" '.[0].id' > /dev/null
+          code=$(rest worker GET "/process-instance/$pi/variables/errorCode" | jq -r .value)
+          if [ "$code" != "BUCHUNG_ABGELEHNT" ] || ! grep -q "fachlich abgelehnt: Budget der Kostenstelle reicht nicht" worker.log; then
+            echo "::error::Erwartet: errorCode BUCHUNG_ABGELEHNT an der Instanz (ist: $code) und \"fachlich abgelehnt\" im Log"
+            exit 1
+          fi
 
       - name: Zustand der Engine bei Fehler
         if: failure()

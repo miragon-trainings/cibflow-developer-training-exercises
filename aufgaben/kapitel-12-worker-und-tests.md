@@ -171,7 +171,7 @@ Unit-Tests ohne Engine, einen Prozesstest zum fachlichen Fehler und Architekturt
 
 ## Euer Worker als Baustein
 
-In Übung 8 habt ihr „Genehmigung verbuchen“ von Hand auf External gestellt und das Topic eingetippt. Ein Element Template macht euren Worker zu einem Baustein: Im Modeler wählt ihn dann auch die Fachseite aus dem Katalog, wie die Bausteine von CIB flow. Das Topic steht fest im Template statt von Hand im Modell, vertippen kann sich niemand mehr. Das Mapping bleibt im Handler: Euer Worker liest `antragsteller`, `betrag` und `begruendung` selbst und schreibt `buchungsnummer` zurück, das Template braucht dafür keine Ein- und Ausgaben.
+In Übung 8 habt ihr „Genehmigung verbuchen“ von Hand auf External gestellt und das Topic eingetippt. Ein Element Template macht euren Worker zu einem Baustein: Im Modeler steht er dann im Katalog wie die Bausteine von CIB flow, einsetzen kann ihn auch, wer im Team nicht entwickelt. Das Topic steht fest im Template statt von Hand im Modell, vertippen kann sich niemand mehr. Das Mapping bleibt im Handler: Euer Worker liest `antragsteller`, `betrag` und `begruendung` selbst und schreibt `buchungsnummer` zurück, das Template braucht dafür keine Ein- und Ausgaben.
 
 Das geht im lokalen Stack, angemeldet als `demo`, an eurem Projekt aus Übung 8. Eine Vorlage gilt dort sofort für alle Konten, und dieselbe ID lässt sich nur einmal hochladen.
 
@@ -274,7 +274,7 @@ Das geht im lokalen Stack, angemeldet als `demo`, an eurem Projekt aus Übung 8.
     `deploy` meldet `Neue Version:` mit eurer Process ID und der nächsten Versionsnummer. Für die Engine ändert sich nichts, sie führt denselben External Task aus wie vorher. `camunda:modelerTemplate` braucht nur der Modeler.
 19. Lasst den Worker laufen oder startet ihn, stellt als `anna` einen Antrag und schließt als `gerda` „Antrag prüfen“ mit „Genehmigt“ ab, wie in Übung 8. Der Worker holt den Task wie vorher, am Code ändert ihr nichts. Das Log zeigt den geholten Task, die Buchung und zuletzt `Task ... erledigt: buchungsnummer = B-2026-...`.
 
-Den Weg der Fachseite probiert ihr an einem neuen Service Task in einem anderen Diagramm: „Vorlage“, „+ Auswählen“, und ohne Suche steht euer Baustein im Abschnitt aus eurem `name`. Nach dem Klick heißt der Task „Genehmigung verbuchen“ und trägt Typ und Topic eures Workers.
+Den Weg über den Katalog probiert ihr an einem neuen Service Task in einem anderen Diagramm: „Vorlage“, „+ Auswählen“, und ohne Suche steht euer Baustein im Abschnitt aus eurem `name`. Nach dem Klick heißt der Task „Genehmigung verbuchen“ und trägt Typ und Topic eures Workers.
 
 **Hinweise**
 
@@ -390,7 +390,7 @@ Der Test-Helfer `EngineHelper.cs` (im Test `_engine`) kapselt die REST-Aufrufe, 
 - Die Simulation speichert ihre Buchungen in `buchungen.json` neben der DLL (`worker/src/GenehmigungWorker/bin/Debug/net10.0/`). Den Pfad gibt `Program.cs` im Konstruktor mit und loggt ihn beim Start. So findet der Worker die Datei, egal wo ihr ihn startet, und sie landet nie im Repo. Die hexagonale Fassung hat ihre eigene Datei.
 - Die Simulation lehnt jede Buchung über 50.000 Euro ab (`BudgetJeBuchung`) und speichert sie nicht. Die Ablehnung ist eine eigene Exception unter `Fachsystem/`, `BuchungAbgelehntException`. Der Handler reicht sie durch, erst die Schleife macht daraus ein `bpmnError`. Die Beträge in Meldung und Log stehen immer im deutschen Format, egal wie der Rechner eingestellt ist.
 - `deploy` mit Pfad spielt eine andere Datei ein, etwa eine Variante unter `prozess/varianten/`. Deployment und Ressource heißen dann wie die Datei, nicht wie der `ProzessKey`.
-- Der Prozesstest in C# nimmt Prozess-Key und Topic aus der Konfiguration (`_engine.ProzessKey`, `_engine.Topic`). Auf der Folie stehen sie ausgeschrieben.
+- Der Prozesstest in C# nimmt Prozess-Key und Topic aus der Konfiguration (`_engine.ProzessKey`, `_engine.Topic`).
 - Der Prozesstest in Java liest Process ID, IDs, Topic und Fehlercode aus Klassen, die bpmn-to-code von Miragon bei jedem Lauf aus den Modellkopien erzeugt, etwa `TASK_PRUEFEN.getValue()` statt `"Task_Pruefen"`. Variablennamen wie `entscheidung` bleiben Text, das Modell legt sie nicht als Ein- oder Ausgabe fest. Die Demo in Kapitel 10 (`GenehmigungsworkflowTag1Test`) schreibt die IDs als Text: Dort macht eine geänderte ID den Test erst beim Lauf rot, mit den Konstanten fällt sie schon beim Übersetzen auf.
 - Die Tests im Startstand in Java sind mit `@Disabled` markiert statt rot. So läuft `./mvnw test` von Anfang an sauber durch, und ihr seht, welche Tests noch fehlen.
 - Der Prozesstest in Java testet die Kopie der Entwickler-Fassung in `prozesstest-java/src/main/resources/`, nicht euer Modell in der Engine. Die GitHub Action hält die Kopie byte-gleich zu `loesung/genehmigungsworkflow-entwickler.bpmn`, ebenso die Kopie der Variante und die Kopien unter `loesung/prozesstest-java/`.

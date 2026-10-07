@@ -1,5 +1,5 @@
 // Testseite, quer durch das Sechseck: Prozesstests mit der echten Engine als externem System.
-// Dieselben Fälle wie in loesung/worker, nur verbucht hier der Engine-Adapter über den Use Case statt des Handlers.
+// Dieselben Fälle wie in worker/, nur verbucht hier der Engine-Adapter über den Use Case statt des Handlers.
 // Das Fachsystem bleibt ein Fake: Der Test prüft Modell, Engine und die Übersetzung an der Grenze im Zusammenspiel.
 namespace GenehmigungWorker.Tests;
 

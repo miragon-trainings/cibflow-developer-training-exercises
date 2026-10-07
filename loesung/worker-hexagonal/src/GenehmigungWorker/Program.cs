@@ -1,7 +1,7 @@
 // Einstiegspunkt des Workers in der hexagonalen Fassung, und nur noch Zusammenbau (Composition Root):
 // Einstellungen lesen, auf Wunsch deployen, die Adapter erzeugen und mit dem Kern verdrahten, Worker starten.
 // Nur hier werden Kern und Adapter erzeugt und verbunden, keine Seite des Sechsecks erzeugt die andere selbst.
-// Die Schleife steht in Adapter/Engine/ExternalTaskWorker.cs, in loesung/worker steht sie noch hier.
+// Die Schleife steht in Adapter/Engine/ExternalTaskWorker.cs, in worker/ steht sie noch hier.
 //   dotnet run                    Worker-Schleife starten, beenden mit Strg+C
 //   dotnet run -- deploy          prozess/genehmigungsworkflow.bpmn in die Engine einspielen
 //   dotnet run -- deploy <pfad>   eine andere BPMN-Datei einspielen, etwa
