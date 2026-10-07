@@ -1,0 +1,3 @@
+# Mockito greift auf Felder und Methoden über Reflection zu, ohne Java Agent. Gilt zusammen mit
+# org.mockito.plugins.MockMaker: Erst beide zusammen halten die Warnungen über dem Lauf fern.
+member-accessor-reflection

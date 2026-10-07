@@ -1,0 +1,5 @@
+# Mockito baut den Mock für ProcessScenario als Unterklasse, ohne sich als Java Agent in die laufende JVM zu laden.
+# Mit der Voreinstellung (mock-maker-inline) stünden über dem Lauf Warnungen von Mockito und Java, etwa
+# "Mockito is currently self-attaching" und "A Java agent has been loaded dynamically".
+# Für ein Interface wie ProcessScenario genügt die Unterklasse. Gilt zusammen mit org.mockito.plugins.MemberAccessor.
+mock-maker-subclass

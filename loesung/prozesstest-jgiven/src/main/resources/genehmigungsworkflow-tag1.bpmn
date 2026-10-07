@@ -16,6 +16,7 @@
   Diese Datei wird erzeugt, nicht von Hand ändern. Byte-gleiche Kopien:
   loesung/prozesstest-java/src/main/resources/genehmigungsworkflow-tag1.bpmn
   loesung/prozesstest-jgiven/src/main/resources/genehmigungsworkflow-tag1.bpmn
+  loesung/prozesstest-scenario/src/main/resources/genehmigungsworkflow-tag1.bpmn
 -->
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
