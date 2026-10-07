@@ -12,7 +12,7 @@
 @prozessKey = Process_Genehmigung
 @topic = genehmigung-verbuchen
 @workerId = worker-lokal
-# Bonus Kapitel 12, fachlicher Fehler: die Variante unter prozess/varianten/
+# Fachlicher Fehler: die Variante unter prozess/varianten/
 @varianteKey = Process_VerbuchenFehlerpfad
 
 # Benutzer aus dem Init-Dienst, Passwort jeweils gleich dem Benutzernamen (nur lokal)
@@ -138,7 +138,7 @@ GET {{baseUrl}}/history/variable-instance?processInstanceId={{gesperrt.response.
 Authorization: Basic {{worker}}:{{worker}}
 
 
-### B1. Bonus Kapitel 12, fachlicher Fehler: Variante deployen
+### B1. Fachlicher Fehler: Variante deployen
 # prozess/varianten/verbuchen-fehlerpfad.bpmn hat am Service Task "Genehmigung verbuchen"
 # ein Error-Boundary für BUCHUNG_ABGELEHNT, das zu "Buchung klären" führt. Euer Modell hat keins.
 # Gleich wirkt im Ordner worker/: dotnet run --project src/GenehmigungWorker -- deploy prozess/varianten/verbuchen-fehlerpfad.bpmn
@@ -163,7 +163,7 @@ Content-Type: application/xml
 
 
 ### B2. Variante starten: ohne Startformular und Initiator, deshalb alle drei Variablen mitgeben
-# Über 50.000 Euro lehnt die Simulation der Musterlösung ab. Euer Worker läuft und meldet bpmnError.
+# Über 50.000 Euro lehnt die Simulation im Worker ab. Läuft der Worker, meldet er bpmnError.
 # Für die Gegenprobe betrag auf 1200 setzen: Dann verbucht der Worker, und die Instanz endet bei "Antrag genehmigt".
 # @name variante
 POST {{baseUrl}}/process-definition/key/{{varianteKey}}/start

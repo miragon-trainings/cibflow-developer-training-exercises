@@ -19,7 +19,7 @@ target/
 # Lokale Zugangsdaten gehören nicht ins Repo
 .env
 
-# Buchungen der BuchungssystemSimulation (Kapitel 12), falls ihr sie außerhalb von bin/ ablegt
+# Buchungen der BuchungssystemSimulation im Worker. Er legt sie unter bin/ ab, das Muster greift auch anderswo
 buchungen.json*
 
 # Betriebssystem

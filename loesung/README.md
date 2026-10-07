@@ -1,6 +1,6 @@
 # Musterlösung zu Übung 8 und 9
 
-Für Übung 8 das umgebaute Modell `genehmigungsworkflow-entwickler.bpmn`. Für Übung 9 zwei vollständige Projekte mit demselben Aufbau wie der Startstand: `worker/` (C#) und `prozesstest-java/` (Java). Ihr baut und testet sie hier, ohne etwas über euren Stand zu kopieren. Dazu liegt unter `worker-hexagonal/` derselbe Worker noch einmal, nach Ports und Adaptern geschnitten, zum Lesen und Vergleichen. Unter `element-template/` liegt die Lösung des Bonus „Euer Worker als Baustein“. Unter `prozesstest-jgiven/` liegt der Ausblick aus Kapitel 10, kein Teil einer Übung.
+Für Übung 8 das umgebaute Modell `genehmigungsworkflow-entwickler.bpmn`. Für Übung 9 die fertigen Prozesstests in Java unter `prozesstest-java/`, ein vollständiges Projekt mit demselben Aufbau wie der Startstand: Ihr baut und testet es hier, ohne etwas über euren Stand zu kopieren. Unter `element-template/` liegt das Element Template, das euren Worker zum Baustein macht. Den Worker in C# bekommt ihr fertig unter `worker/` im Repo-Root, unter `worker-hexagonal/` liegt er noch einmal, nach Ports und Adaptern geschnitten, zum Lesen und Vergleichen. Unter `prozesstest-jgiven/` liegt der Ausblick aus Kapitel 10, kein Teil einer Übung.
 
 ## Lösung von Übung 8
 
@@ -20,14 +20,7 @@ Danach deployt ihr sie im Ordner `worker/` mit `dotnet run --project src/Genehmi
 
 ## Bauen und testen
 
-Jeweils vom Repo-Root aus, in bash und PowerShell gleich bis auf den Maven Wrapper:
-
-```bash
-cd loesung/worker
-dotnet test --filter "Kategorie!=Prozesstest"   # ohne Engine: 9 Tests
-dotnet test                                     # mit laufendem Stack und bereitgestelltem Modell: 12 Tests
-dotnet run --project src/GenehmigungWorker      # startet den Worker der Musterlösung
-```
+Vom Repo-Root aus:
 
 ```bash
 cd loesung/prozesstest-java
@@ -38,27 +31,21 @@ Die Java-Tests `GenehmigungsworkflowTest` und `FehlerpfadTest` lesen Process ID,
 
 Nach dem Lauf liegt je Testklasse ein Abdeckungsbericht unter `loesung/prozesstest-java/target/process-test-coverage/<Testklasse>/report.html`, etwa `io.miragon.schulung.genehmigung.GenehmigungsworkflowTest/report.html`. Öffnet ihn im Browser: Er zeigt das Modell, darin grün, was die Tests durchlaufen haben, und die Abdeckung in Prozent. In der Musterlösung sind es für `GenehmigungsworkflowTest` und `GenehmigungsworkflowTag1Test` je 21 von 27, `77.78%`, weiß bleibt die Rücknahme, für `FehlerpfadTest` 12 von 12, `100.00%`. Was der Bericht zeigt, steht in [prozesstest-java/README.md](../prozesstest-java/README.md#abdeckung-im-modell).
 
-Die User Secrets aus Übung 8 gelten auch hier, beide Worker-Projekte haben dieselbe `UserSecretsId`. Mit eigenem Projekt tragt ihr euren `ProzessKey` auch in `loesung/worker/src/GenehmigungWorker/appsettings.json` ein.
-
 ## Mit eurem Stand vergleichen
 
 Im Repo-Root, bash und PowerShell gleich:
 
 ```bash
-git diff --no-index worker/src loesung/worker/src
-git diff --no-index worker/tests loesung/worker/tests
 git diff --no-index prozesstest-java/src loesung/prozesstest-java/src
 ```
 
-Nach einem Build zeigen die ersten beiden Befehle auch die Build-Ausgaben unter `bin/` und `obj/`. Vergleicht dann einzelne Dateien, etwa `git diff --no-index worker/src/GenehmigungWorker/Program.cs loesung/worker/src/GenehmigungWorker/Program.cs`.
-
 Was jede Datei macht und wie ihr einzelne übernehmt, steht im Aufgabenblatt unter [Übung 9, Musterlösung](../aufgaben/kapitel-12-worker-und-tests.md#musterlösung).
 
-Für Trainer: `.github/scripts/loesung-abgleich.sh` prüft, auch in der CI, dass die Musterlösung jede Datei des Startstands enthält und nur in den Übungsdateien abweicht. Die Liste der Übungsdateien steht im Skript.
+Für Trainer: `.github/scripts/loesung-abgleich.sh` prüft, auch in der CI, dass die Musterlösung in Java jede Datei des Startstands enthält und nur in den Übungsdateien abweicht. Die Liste der Übungsdateien steht im Skript.
 
 ## Hexagonale Fassung
 
-`worker-hexagonal/` macht dasselbe wie `worker/`, mit denselben Logzeilen, Variablen und Fehlern. Die Fachlogik steht dort in einem eigenen Projekt, `GenehmigungWorker.Domaene`, das die Engine nicht kennt: Zwischen Engine und Fachlogik stehen Adapter, und die Fachlogik spricht nur über ihre Ports nach außen. In Übung 9 baut ihr die Schichten-Fassung wie unter `worker/`, umbauen müsst ihr nichts. Was anders ist, warum und wo der Schnitt an Grenzen stößt, steht in [worker-hexagonal/README.md](worker-hexagonal/README.md).
+`worker-hexagonal/` macht dasselbe wie der Worker unter `worker/` im Repo-Root, mit denselben Logzeilen, Variablen und Fehlern. Die Fachlogik steht dort in einem eigenen Projekt, `GenehmigungWorker.Domaene`, das die Engine nicht kennt: Zwischen Engine und Fachlogik stehen Adapter, und die Fachlogik spricht nur über ihre Ports nach außen. Der Worker unter `worker/`, den ihr in Übung 8 und 9 startet, ist in Schichten geschnitten, umbauen müsst ihr nichts. Was anders ist, warum und wo der Schnitt an Grenzen stößt, steht in [worker-hexagonal/README.md](worker-hexagonal/README.md).
 
 Vom Repo-Root aus, in bash und PowerShell gleich:
 
@@ -69,11 +56,11 @@ dotnet test                                     # mit laufendem Stack und bereit
 dotnet run --project src/GenehmigungWorker      # startet den Worker der hexagonalen Fassung
 ```
 
-Zugangsdaten und `ProzessKey` gelten wie für `worker/`, und auch hier stoppt ihr vorher euren eigenen Worker. Für Trainer: `.github/scripts/loesung-abgleich.sh` prüft auch, dass die Dateien, die `worker-hexagonal/` unverändert aus `worker/` übernimmt, gleich bleiben.
+Die User Secrets aus Übung 8 gelten auch hier, beide Worker-Projekte haben dieselbe `UserSecretsId`. Mit eigenem Projekt tragt ihr euren `ProzessKey` auch in `worker-hexagonal/src/GenehmigungWorker/appsettings.json` ein. Stoppt vorher den Worker unter `worker/`, beide hören auf dasselbe Topic. Für Trainer: `.github/scripts/loesung-abgleich.sh` prüft auch, dass die Dateien, die `worker-hexagonal/` unverändert aus `worker/` im Repo-Root übernimmt, gleich bleiben.
 
 ## Element Template
 
-`element-template/genehmigung-verbuchen.json` macht euren Worker zu einem Baustein im Katalog des Modelers: Der Service Task bekommt `camunda:type` external und das Topic `genehmigung-verbuchen` fest aus der Vorlage, der Katalog zeigt ihn im Abschnitt „Genehmigungsworkflow“ als „Extern“ mit Version 1.0.0. Hochladen, anwenden und deployen erklärt das Aufgabenblatt unter [Bonus: Euer Worker als Baustein](../aufgaben/kapitel-12-worker-und-tests.md#bonus-euer-worker-als-baustein). Für Trainer: Die GitHub Action prüft, dass Typ und Topic der Vorlage zu `Task_Verbuchen` in `genehmigungsworkflow-entwickler.bpmn` passen.
+`element-template/genehmigung-verbuchen.json` macht euren Worker zu einem Baustein im Katalog des Modelers: Der Service Task bekommt `camunda:type` external und das Topic `genehmigung-verbuchen` fest aus der Vorlage, der Katalog zeigt ihn im Abschnitt „Genehmigungsworkflow“ als „Extern“ mit Version 1.0.0. Hochladen, anwenden und deployen erklärt das Aufgabenblatt unter [Euer Worker als Baustein](../aufgaben/kapitel-12-worker-und-tests.md#euer-worker-als-baustein). Für Trainer: Die GitHub Action prüft, dass Typ und Topic der Vorlage zu `Task_Verbuchen` in `genehmigungsworkflow-entwickler.bpmn` passen.
 
 ## JGiven-Demo (Ausblick in Kapitel 10)
 

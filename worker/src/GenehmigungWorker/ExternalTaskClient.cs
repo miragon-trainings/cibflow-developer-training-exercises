@@ -31,8 +31,8 @@ public record LockedTaskDto(
 public record VariableDto(JsonElement Value, string? Type);
 
 /// <summary>
-/// Die drei REST-Calls des External-Task-Protokolls gegen /engine-rest:
-/// fetchAndLock, complete und failure.
+/// Die vier REST-Calls des External-Task-Protokolls gegen /engine-rest:
+/// fetchAndLock, complete, failure und bpmnError.
 /// </summary>
 /// <param name="http">HttpClient mit EngineUrl als BaseAddress (ohne /engine-rest) und Basic Auth</param>
 /// <param name="workerId">aus appsettings.json, je Instanz eindeutig</param>
@@ -84,6 +84,24 @@ public class ExternalTaskClient(HttpClient http, string workerId, string topic)
                 errorMessage = meldung,
                 retries,
                 retryTimeout = (long) retryTimeout.TotalMilliseconds
+            });
+        antwort.EnsureSuccessStatusCode();
+    }
+
+    /// <summary>
+    /// Fachlicher Fehler: Die Engine wirft am Service Task den BPMN-Fehler mit errorCode.
+    /// Ein Error-Boundary mit diesem Code fängt ihn, und der Token nimmt dessen Pfad.
+    /// Kein Retry, kein Incident. Fängt ihn kein Boundary, endet die Instanz still am Service Task.
+    /// </summary>
+    public async Task BpmnErrorAsync(ExternalTask task, string errorCode, string meldung)
+    {
+        var antwort = await http.PostAsJsonAsync(
+            $"/engine-rest/external-task/{task.Id}/bpmnError",
+            new
+            {
+                workerId,
+                errorCode,                // etwa BUCHUNG_ABGELEHNT, exakt wie im Modell
+                errorMessage = meldung    // der Grund, das Boundary legt ihn in errorMessage ab
             });
         antwort.EnsureSuccessStatusCode();
     }
