@@ -2,7 +2,7 @@
 
 Dieser Ordner startet CIB flow auf eurem Laptop: die Engine, die Weboberfläche und die Werkzeuge (Modeler, easyForm, Prozessmanagement, Ressourcen). Nur für die Schulung, nicht produktiv verwenden.
 
-Ob auf eurem Rechner alles läuft, vom Startstand bis zur Musterlösung, prüft ihr mit dem [Setup-Check](SETUP-CHECK.md).
+Ob auf eurem Rechner alles läuft, vom Worker bis zum Prozesstest, prüft ihr mit dem [Setup-Check](SETUP-CHECK.md).
 
 ## Voraussetzungen
 
@@ -40,7 +40,7 @@ Passwort jeweils gleich dem Benutzernamen. Die Konten gibt es nur auf eurem Lapt
 | `demo` | Admin | Administration, Prozessmanagement, Import des Projekts |
 | `anna` | Antragstellerin | stellt Anträge über „Prozess starten“, bekommt „Antrag nachbessern“ und „Genehmigende Stelle benachrichtigen“ |
 | `gerda` | Genehmigerin, Gruppe `genehmiger` | bearbeitet „Antrag prüfen“, „Ablehnung mitteilen“, „Erinnerung senden“ und vor Übung 8 „Genehmigung verbuchen“ |
-| `worker` | technischer Benutzer | für euren C#-Worker, die Tests und REST-Aufrufe |
+| `worker` | technischer Benutzer | für den C#-Worker, den Prozesstest in C# und REST-Aufrufe |
 
 Die Autorisierung ist lokal aus: Jeder angemeldete Benutzer sieht alle Kacheln und darf alles. Wem eine Aufgabe gehört, zeigen in „Aufgaben bearbeiten“ die Filter „Meine Aufgaben“ und „Aufgaben meiner Gruppen“.
 
@@ -73,7 +73,7 @@ Nach `down -v` legt der nächste `docker compose up -d` die Benutzer neu an. Sol
 
 **Der Pull bricht mit `unauthorized` oder `401 Unauthorized` ab.** Ihr seid nicht bei `harbor.cib.de` angemeldet, oder die Anmeldung ist abgelaufen. `docker login harbor.cib.de` mit den Zugangsdaten aus der Setup-Mail wiederholen, dann `docker compose up -d`.
 
-**Ein Port ist belegt.** `docker compose up -d` meldet `port is already allocated` oder `address already in use`. Findet das Programm mit `lsof -i :8080` (macOS, Linux) oder `netstat -ano | findstr :8080` (Windows, die letzte Spalte ist die PID) und beendet es, unter Windows mit `taskkill /PID <PID> /F` oder im Task-Manager im Reiter „Details“. Geht das nicht, legt den Dienst auf einen anderen Port: In `docker-compose.yml` die linke Portnummer ändern, etwa `"127.0.0.1:8081:8080"`, und in `config/common-config.yaml` die `external-url` des Dienstes anpassen. Bei der Engine zusätzlich `EngineUrl` in `worker/src/GenehmigungWorker/appsettings.json` und in `loesung/worker/src/GenehmigungWorker/appsettings.json` sowie `@baseUrl` in `http/genehmigungsworkflow.http`.
+**Ein Port ist belegt.** `docker compose up -d` meldet `port is already allocated` oder `address already in use`. Findet das Programm mit `lsof -i :8080` (macOS, Linux) oder `netstat -ano | findstr :8080` (Windows, die letzte Spalte ist die PID) und beendet es, unter Windows mit `taskkill /PID <PID> /F` oder im Task-Manager im Reiter „Details“. Geht das nicht, legt den Dienst auf einen anderen Port: In `docker-compose.yml` die linke Portnummer ändern, etwa `"127.0.0.1:8081:8080"`, und in `config/common-config.yaml` die `external-url` des Dienstes anpassen. Bei der Engine zusätzlich `EngineUrl` in `worker/src/GenehmigungWorker/appsettings.json` sowie `@baseUrl` in `http/genehmigungsworkflow.http`.
 
 **Dienste starten immer wieder neu, die Oberfläche bleibt unvollständig.** Docker hat zu wenig Speicher. `docker compose ps` zeigt `Restarting` oder `Exited (137)`. Gebt Docker mindestens 8 GB, wie unter [Voraussetzungen](#voraussetzungen) beschrieben, und startet mit `docker compose up -d` neu.
 

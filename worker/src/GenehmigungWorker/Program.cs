@@ -6,6 +6,8 @@
 // Im Ordner worker/ jeweils mit --project src/GenehmigungWorker, etwa:
 //   dotnet run --project src/GenehmigungWorker -- deploy
 using GenehmigungWorker;
+using GenehmigungWorker.Fachsystem;
+using GenehmigungWorker.Handlers;
 
 // Umlaute auch in der Windows-Konsole richtig anzeigen
 Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -33,9 +35,11 @@ if (args is ["deploy", ..])
 
 var client = new ExternalTaskClient(http, einstellungen.WorkerId, einstellungen.Topic);
 
-// TODO Kapitel 12, Schritt 3: Handler anlegen, etwa
-//   var handler = new GenehmigungVerbuchenHandler(new BuchungssystemSimulation());
-//   (dazu oben: using GenehmigungWorker.Fachsystem; using GenehmigungWorker.Handlers;)
+// Die Simulation merkt sich ihre Buchungen in einer Datei neben der DLL (bin/...).
+// So bleibt die Buchung auch über einen Neustart des Workers idempotent.
+// Löscht ihr die Datei, beginnt die Simulation wieder bei 0001.
+var buchungen = Path.Combine(AppContext.BaseDirectory, "buchungen.json");
+var handler = new GenehmigungVerbuchenHandler(new BuchungssystemSimulation(buchungen));
 
 // Strg+C beendet die Schleife sauber: Die Schleife prüft stop vor jedem Fetch,
 // ein gerade wartendes fetchAndLock bricht mit OperationCanceledException ab.
@@ -49,6 +53,7 @@ var stop = abbruch.Token;
 
 Log($"Worker {einstellungen.WorkerId} holt Tasks vom Topic {einstellungen.Topic} " +
     $"bei {einstellungen.EngineUrl}. Beenden mit Strg+C.");
+Log($"Buchungen der Simulation: {buchungen}");
 
 try
 {
@@ -56,26 +61,37 @@ try
     {
         foreach (var task in await client.FetchAndLockAsync(stop))
         {
-            // Kapitel 11: Task holen und loggen, noch kein complete.
-            // Der Lock läuft deshalb nach 30 s ab, danach holt der Worker denselben Task erneut.
             Log($"Task {task.Id} geholt: Business Key {task.BusinessKey ?? "(keiner)"}, " +
                 $"Prozessinstanz {task.ProcessInstanceId}, Retries {task.Retries?.ToString() ?? "(noch keine)"}");
-            foreach (var (name, wert) in task.Variables)
+            try
             {
-                Log($"  {name} = {wert}");
+                var ergebnis = handler.Handle(task);
+                await client.CompleteAsync(task, ergebnis);
+                Log($"Task {task.Id} erledigt: {string.Join(", ", ergebnis.Select(e => $"{e.Key} = {e.Value}"))}");
             }
-
-            // TODO Kapitel 12, Schritt 3: Worker-Schleife anschließen
-            //   try
-            //   {
-            //       var ergebnis = handler.Handle(task);
-            //       await client.CompleteAsync(task, ergebnis);
-            //   }
-            //   catch (Exception ex)
-            //   {
-            //       var verbleibend = task.Retries is int r ? r - 1 : 3;
-            //       await client.FailureAsync(task, ex.Message, verbleibend, TimeSpan.FromMinutes(5));
-            //   }
+            catch (BuchungAbgelehntException abgelehnt)
+            {
+                // Fachlicher Fehler, kein Bug: Ein Retry hilft nicht, deshalb bpmnError statt failure.
+                // Dieser catch steht vor catch (Exception), sonst fängt der allgemeine auch die Ablehnung.
+                // In der Variante prozess/varianten/verbuchen-fehlerpfad.bpmn fängt das Error-Boundary
+                // BUCHUNG_ABGELEHNT und führt zu "Buchung klären".
+                // Ohne passendes Error-Boundary, etwa in eurem Genehmigungsworkflow, beendet die Engine die Instanz still
+                // am Service Task: abgeschlossen, aber ohne "Antrag genehmigt", ohne Incident, und der Grund
+                // steht nur im Log der Engine. bpmnError also nur, wenn das Modell den Code auch fängt.
+                await client.BpmnErrorAsync(task, "BUCHUNG_ABGELEHNT", abgelehnt.Message);
+                Log($"Task {task.Id} fachlich abgelehnt: {abgelehnt.Message}. bpmnError BUCHUNG_ABGELEHNT gemeldet.");
+            }
+            catch (Exception ex)
+            {
+                // Technischer Fehler: beim ersten Mal 3 Versuche, danach herunterzählen.
+                // Bei 0 legt die Engine einen Incident an, zu sehen im Cockpit.
+                var verbleibend = task.Retries is int r ? r - 1 : 3;
+                await client.FailureAsync(task, ex.Message, verbleibend, TimeSpan.FromMinutes(5));
+                Log($"Task {task.Id} fehlgeschlagen: {ex.Message} " +
+                    (verbleibend > 0
+                        ? $"Noch {verbleibend} Versuche, der nächste in fünf Minuten."
+                        : "Keine Versuche mehr, die Engine legt einen Incident an."));
+            }
         }
     }
 }

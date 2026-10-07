@@ -2,7 +2,7 @@ namespace GenehmigungWorker.Fachsystem;
 
 /// <summary>
 /// Die eine Stelle nach außen: das Fachsystem, in dem der Worker die Genehmigung verbucht.
-/// Im Worker steckt dahinter die BuchungssystemSimulation, im Unit-Test ein Fake,
+/// Im Worker steckt dahinter die BuchungssystemSimulation, im Prozesstest unter tests/ ein Fake,
 /// später das echte Fachsystem.
 /// </summary>
 public interface IBuchungssystem

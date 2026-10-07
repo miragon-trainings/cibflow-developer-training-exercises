@@ -14,7 +14,7 @@ public class FehlerpfadTests : IDisposable
     private const string Variante = "prozess/varianten/verbuchen-fehlerpfad.bpmn";
     private const string VarianteKey = "Process_VerbuchenFehlerpfad";
 
-    private readonly EngineHelfer _engine = new();
+    private readonly EngineHelper _engine = new();
     // Eigene Datei für die Simulation, damit der Test die Buchungen des Workers nicht berührt
     private readonly string _buchungen = Path.Combine(Path.GetTempPath(), $"buchungen-{Guid.NewGuid():N}.json");
 
@@ -39,7 +39,7 @@ public class FehlerpfadTests : IDisposable
         var abgelehnt = Assert.Throws<BuchungAbgelehntException>(() => adapter.Handle(task));
 
         // Melden wie die Schleife, unter der Worker-ID des Tests: Ihr gehört der Lock
-        var client = new ExternalTaskClient(http, EngineHelfer.WorkerId, _engine.Topic);
+        var client = new ExternalTaskClient(http, EngineHelper.WorkerId, _engine.Topic);
         await client.BpmnErrorAsync(task, "BUCHUNG_ABGELEHNT", abgelehnt.Message);
 
         // Prüfen: Das Error-Boundary fängt den Fehler, "Buchung klären" wartet mit Code und Grund

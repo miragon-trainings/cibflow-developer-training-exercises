@@ -1,8 +1,8 @@
 # Musterlösung zu Übung 9, hexagonal geschnitten
 
-Derselbe Worker wie in [`loesung/worker/`](../worker/), nach Ports und Adaptern geschnitten. Er tut genau dasselbe: gleiche Logzeilen, gleiche Variablen, gleicher Idempotenz-Schlüssel (Business Key, sonst Prozessinstanz-ID), gleiche Fehlerbehandlung mit `complete`, `failure` und `bpmnError`. Anders ist nur, wo welcher Code liegt: Die Fachlogik steht in einem eigenen Projekt, das die Engine nie kennt.
+Derselbe Worker wie in [`worker/`](../../worker/), nach Ports und Adaptern geschnitten. Er tut genau dasselbe: gleiche Logzeilen, gleiche Variablen, gleicher Idempotenz-Schlüssel (Business Key, sonst Prozessinstanz-ID), gleiche Fehlerbehandlung mit `complete`, `failure` und `bpmnError`. Anders ist nur, wo welcher Code liegt: Die Fachlogik steht in einem eigenen Projekt, das die Engine nie kennt.
 
-In Übung 9 baut ihr die Schichten-Fassung, so wie sie unter `worker/` angelegt ist. Diese Fassung ist zum Lesen und Vergleichen da, niemand muss umbauen.
+In Übung 8 und 9 startet ihr die Schichten-Fassung unter `worker/` im Repo-Root. Diese Fassung ist zum Lesen und Vergleichen da, niemand muss umbauen.
 
 ## Das Sechseck in diesem Worker
 
@@ -44,11 +44,11 @@ loesung/worker-hexagonal/
 │       └── IBuchungssystem.cs                     # ausgehender Port
 ├── src/GenehmigungWorker/                         # Konsolen-App: Adapter und Zusammenbau
 │   ├── Program.cs                                 # nur Zusammenbau: Einstellungen, deploy, Adapter verdrahten, Worker starten
-│   ├── Einstellungen.cs, Deploy.cs                # unverändert aus loesung/worker
-│   ├── appsettings.json                           # unverändert aus loesung/worker
+│   ├── Einstellungen.cs, Deploy.cs                # unverändert aus worker/
+│   ├── appsettings.json                           # unverändert aus worker/
 │   └── Adapter/
 │       ├── Engine/
-│       │   ├── ExternalTaskClient.cs              # aus loesung/worker, nur der Namespace ist anders
+│       │   ├── ExternalTaskClient.cs              # aus worker/, nur der Namespace ist anders
 │       │   ├── ExternalTaskWorker.cs              # die Schleife: fetchAndLock, complete, failure, bpmnError
 │       │   └── GenehmigungVerbuchenAdapter.cs     # Variablen lesen, Use Case rufen, buchungsnummer zurück
 │       └── Fachsystem/
@@ -58,7 +58,8 @@ loesung/worker-hexagonal/
     ├── GenehmigungVerbuchenAdapterTests.cs        # Abbildung der Variablen: Text, Zahl, de-DE, fehlende Variable
     ├── BuchungssystemSimulationTests.cs           # Idempotenz und Ablehnung der Simulation
     ├── ArchitekturTests.cs                        # "Die Domäne kennt die Engine nicht"
-    ├── ExternalTaskClientTests.cs, EngineHelfer.cs  # unverändert aus loesung/worker
+    ├── ExternalTaskClientTests.cs                 # bpmnError ohne Engine: Pfad und Body der Anfrage
+    ├── EngineHelper.cs                            # unverändert aus worker/
     ├── BuchungssystemFake.cs                      # Fake des ausgehenden Ports
     ├── GenehmigungsworkflowTests.cs               # Prozesstests gegen die Engine, über Adapter und Use Case
     └── FehlerpfadTests.cs                         # Prozesstest zum fachlichen Fehler, über Adapter und Use Case
@@ -66,7 +67,7 @@ loesung/worker-hexagonal/
 
 ## Schichten-Fassung und hexagonale Fassung
 
-| Schichten-Fassung (`loesung/worker/`) | Hexagonale Fassung (`loesung/worker-hexagonal/`) | Was sich ändert |
+| Schichten-Fassung (`worker/`) | Hexagonale Fassung (`loesung/worker-hexagonal/`) | Was sich ändert |
 |---|---|---|
 | `src/GenehmigungWorker/Handlers/GenehmigungVerbuchenHandler.cs` | `src/GenehmigungWorker/Adapter/Engine/GenehmigungVerbuchenAdapter.cs` und `src/GenehmigungWorker.Domaene/GenehmigungVerbuchen.cs` | Der Handler liest Variablen und ruft das Fachsystem. Jetzt liest der Adapter die Variablen und baut eine `Genehmigung`, der Use Case verbucht sie. |
 | (vier einzelne Werte) | `src/GenehmigungWorker.Domaene/Genehmigung.cs` | neu: das Domänenobjekt, das durch den Kern läuft |
@@ -77,15 +78,17 @@ loesung/worker-hexagonal/
 | `src/GenehmigungWorker/Program.cs` | `src/GenehmigungWorker/Program.cs` und `src/GenehmigungWorker/Adapter/Engine/ExternalTaskWorker.cs` | `Program.cs` baut nur noch zusammen, die Schleife ist ein eigener Adapter, Logzeilen gleich |
 | `src/GenehmigungWorker/ExternalTaskClient.cs` | `src/GenehmigungWorker/Adapter/Engine/ExternalTaskClient.cs` | nur der Namespace |
 | `Einstellungen.cs`, `Deploy.cs`, `appsettings.json` | gleich | unverändert |
-| `tests/.../GenehmigungVerbuchenHandlerTests.cs` | `GenehmigungVerbuchenTests.cs`, `GenehmigungVerbuchenAdapterTests.cs`, `BuchungssystemSimulationTests.cs` | aufgeteilt nach Kern, eingehendem und ausgehendem Adapter |
+| (keine Datei) | `GenehmigungVerbuchenTests.cs`, `GenehmigungVerbuchenAdapterTests.cs`, `BuchungssystemSimulationTests.cs` | nur hier: Unit-Tests, aufgeteilt nach Kern, eingehendem und ausgehendem Adapter |
 | `tests/.../BuchungssystemFake.cs` | `tests/.../BuchungssystemFake.cs` | merkt sich jede `Genehmigung` und kann ablehnen, damit der Use Case ohne Simulation testbar ist |
 | (keine Datei) | `tests/.../ArchitekturTests.cs` | neu: prüft die Regel bei jedem Testlauf |
-| `tests/.../ExternalTaskClientTests.cs`, `EngineHelfer.cs` | gleich | unverändert |
-| `tests/.../GenehmigungsworkflowTests.cs`, `FehlerpfadTests.cs` | gleich benannt | dieselben Fälle, über Adapter und Use Case statt Handler |
+| (keine Datei) | `tests/.../ExternalTaskClientTests.cs` | nur hier: `BpmnErrorAsync` ohne Engine |
+| `tests/.../EngineHelper.cs` | gleich | unverändert |
+| `tests/.../GenehmigungsworkflowTests.cs` | gleich benannt | dieselben Fälle, über Adapter und Use Case statt Handler |
+| (keine Datei) | `tests/.../FehlerpfadTests.cs` | nur hier: Prozesstest gegen die Variante mit Fehlerpfad, deployt sie selbst |
 
 Die übernommenen Dateien sprechen in Kommentaren und Meldungen weiter von der Schichten-Fassung: Mit dem Handler ist hier der `GenehmigungVerbuchenAdapter` gemeint, mit dem Ordner `worker/` der Ordner `loesung/worker-hexagonal/`.
 
-Den Unterschied seht ihr im Repo-Root, bash und PowerShell gleich: `git diff --no-index loesung/worker/src loesung/worker-hexagonal/src`. Nach einem Build zeigt das auch `bin/` und `obj/`, vergleicht dann einzelne Dateien.
+Den Unterschied seht ihr im Repo-Root, bash und PowerShell gleich: `git diff --no-index worker/src loesung/worker-hexagonal/src`. Nach einem Build zeigt das auch `bin/` und `obj/`, vergleicht dann einzelne Dateien.
 
 ## Warum so geschnitten
 
@@ -105,7 +108,7 @@ Mehr dazu im Miragon-Blog: [Camunda-7-Migration: Neue Engine, alte Abhängigkeit
 
 ## Bauen und testen
 
-Im Repo-Root, mit denselben Zugangsdaten wie für `loesung/worker/`. Beide Worker haben dieselbe `UserSecretsId`, eure User Secrets aus Übung 8 gelten also auch hier. Mit eigenem Projekt tragt ihr euren `ProzessKey` auch in `loesung/worker-hexagonal/src/GenehmigungWorker/appsettings.json` ein. Stoppt vorher jeden anderen Worker, alle hören auf dasselbe Topic.
+Im Repo-Root, mit denselben Zugangsdaten wie für `worker/`. Beide Worker haben dieselbe `UserSecretsId`, eure User Secrets aus Übung 8 gelten also auch hier. Mit eigenem Projekt tragt ihr euren `ProzessKey` auch in `loesung/worker-hexagonal/src/GenehmigungWorker/appsettings.json` ein. Stoppt vorher jeden anderen Worker, alle hören auf dasselbe Topic.
 
 ```bash
 # bash, zsh, Git Bash
@@ -125,4 +128,4 @@ dotnet test                                     # mit laufendem Stack und bereit
 dotnet run --project src\GenehmigungWorker      # startet den Worker der hexagonalen Fassung
 ```
 
-Nur die Architekturtests: `dotnet test --filter "FullyQualifiedName~ArchitekturTests"`. Der Worker legt seine Buchungen in `src/GenehmigungWorker/bin/Debug/net10.0/buchungen.json` ab, eine eigene Datei, getrennt von der in `loesung/worker/`. Die beiden Fassungen kennen ihre Buchungen gegenseitig nicht, die Nummern beginnen deshalb wieder bei 0001.
+Nur die Architekturtests: `dotnet test --filter "FullyQualifiedName~ArchitekturTests"`. Der Worker legt seine Buchungen in `src/GenehmigungWorker/bin/Debug/net10.0/buchungen.json` ab, eine eigene Datei, getrennt von der unter `worker/`. Die beiden Fassungen kennen ihre Buchungen gegenseitig nicht, die Nummern beginnen deshalb wieder bei 0001.
