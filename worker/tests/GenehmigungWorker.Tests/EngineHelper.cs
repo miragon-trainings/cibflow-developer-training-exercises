@@ -14,7 +14,7 @@ namespace GenehmigungWorker.Tests;
 /// Antwortet die Engine nicht, lehnt sie einen Call ab oder kommt ein Zustand nicht,
 /// sagt die Fehlermeldung des Tests, was er vorgefunden hat und was ihr tun könnt.
 /// </summary>
-public sealed class EngineHelfer : IDisposable
+public sealed class EngineHelper : IDisposable
 {
     /// <summary>Eigene Worker-ID des Tests, damit ihr im Cockpit seht, wer den Lock hält</summary>
     public const string WorkerId = "prozesstest";
@@ -29,7 +29,7 @@ public sealed class EngineHelfer : IDisposable
     private readonly ExternalTaskClient _client;
     private readonly List<string> _gestartet = [];
 
-    public EngineHelfer()
+    public EngineHelper()
     {
         var einstellungen = Einstellungen.Laden();
         ProzessKey = einstellungen.ProzessKey;

@@ -9,8 +9,8 @@ namespace GenehmigungWorker.Tests;
 [Trait("Kategorie", "Prozesstest")]
 public class GenehmigungsworkflowTests : IDisposable
 {
-    // Der Test-Helfer ist fertig: je Methode ein REST-Endpunkt, er wartet auf den Zustand. Siehe EngineHelfer.cs
-    private readonly EngineHelfer _engine = new();
+    // Der Test-Helfer ist fertig: je Methode ein REST-Endpunkt, er wartet auf den Zustand. Siehe EngineHelper.cs
+    private readonly EngineHelper _engine = new();
 
     // TODO Kapitel 12, Schritt 4: Test schreiben, Methode async machen, danach "(Skip = ...)" entfernen
     [Fact(Skip = "TODO Kapitel 12, Schritt 4: Prozesstest schreiben, dann Skip entfernen")]

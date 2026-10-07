@@ -58,7 +58,7 @@ loesung/worker-hexagonal/
     ├── GenehmigungVerbuchenAdapterTests.cs        # Abbildung der Variablen: Text, Zahl, de-DE, fehlende Variable
     ├── BuchungssystemSimulationTests.cs           # Idempotenz und Ablehnung der Simulation
     ├── ArchitekturTests.cs                        # "Die Domäne kennt die Engine nicht"
-    ├── ExternalTaskClientTests.cs, EngineHelfer.cs  # unverändert aus loesung/worker
+    ├── ExternalTaskClientTests.cs, EngineHelper.cs  # unverändert aus loesung/worker
     ├── BuchungssystemFake.cs                      # Fake des ausgehenden Ports
     ├── GenehmigungsworkflowTests.cs               # Prozesstests gegen die Engine, über Adapter und Use Case
     └── FehlerpfadTests.cs                         # Prozesstest zum fachlichen Fehler, über Adapter und Use Case
@@ -80,7 +80,7 @@ loesung/worker-hexagonal/
 | `tests/.../GenehmigungVerbuchenHandlerTests.cs` | `GenehmigungVerbuchenTests.cs`, `GenehmigungVerbuchenAdapterTests.cs`, `BuchungssystemSimulationTests.cs` | aufgeteilt nach Kern, eingehendem und ausgehendem Adapter |
 | `tests/.../BuchungssystemFake.cs` | `tests/.../BuchungssystemFake.cs` | merkt sich jede `Genehmigung` und kann ablehnen, damit der Use Case ohne Simulation testbar ist |
 | (keine Datei) | `tests/.../ArchitekturTests.cs` | neu: prüft die Regel bei jedem Testlauf |
-| `tests/.../ExternalTaskClientTests.cs`, `EngineHelfer.cs` | gleich | unverändert |
+| `tests/.../ExternalTaskClientTests.cs`, `EngineHelper.cs` | gleich | unverändert |
 | `tests/.../GenehmigungsworkflowTests.cs`, `FehlerpfadTests.cs` | gleich benannt | dieselben Fälle, über Adapter und Use Case statt Handler |
 
 Die übernommenen Dateien sprechen in Kommentaren und Meldungen weiter von der Schichten-Fassung: Mit dem Handler ist hier der `GenehmigungVerbuchenAdapter` gemeint, mit dem Ordner `worker/` der Ordner `loesung/worker-hexagonal/`.

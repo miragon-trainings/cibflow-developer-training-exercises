@@ -5,7 +5,7 @@
 #   loesung/worker/            gleicher Aufbau wie worker/
 #   loesung/prozesstest-java/  gleicher Aufbau wie prozesstest-java/
 #
-# Ändert ihr eine Datei im Startstand, die nicht zur Übung gehört (etwa EngineHelfer.cs oder pom.xml),
+# Ändert ihr eine Datei im Startstand, die nicht zur Übung gehört (etwa EngineHelper.cs oder pom.xml),
 # kopiert sie nach loesung/. Kommt eine Übungsdatei dazu, tragt sie unten ein.
 #
 # Dazu: loesung/worker-hexagonal/ ist derselbe Worker nach Ports und Adaptern geschnitten, mit eigenem Aufbau.
@@ -80,7 +80,7 @@ HEXAGONAL_GLEICH="
 src/GenehmigungWorker/Einstellungen.cs:src/GenehmigungWorker/Einstellungen.cs
 src/GenehmigungWorker/Deploy.cs:src/GenehmigungWorker/Deploy.cs
 src/GenehmigungWorker/appsettings.json:src/GenehmigungWorker/appsettings.json
-tests/GenehmigungWorker.Tests/EngineHelfer.cs:tests/GenehmigungWorker.Tests/EngineHelfer.cs
+tests/GenehmigungWorker.Tests/EngineHelper.cs:tests/GenehmigungWorker.Tests/EngineHelper.cs
 tests/GenehmigungWorker.Tests/ExternalTaskClientTests.cs:tests/GenehmigungWorker.Tests/ExternalTaskClientTests.cs
 "
 for paar in $HEXAGONAL_GLEICH; do

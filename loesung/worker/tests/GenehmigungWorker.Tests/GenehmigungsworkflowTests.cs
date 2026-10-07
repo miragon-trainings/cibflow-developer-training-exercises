@@ -9,7 +9,7 @@ namespace GenehmigungWorker.Tests;
 [Trait("Kategorie", "Prozesstest")]
 public class GenehmigungsworkflowTests : IDisposable
 {
-    private readonly EngineHelfer _engine = new();
+    private readonly EngineHelper _engine = new();
 
     [Fact]
     public async Task Genehmigter_Antrag_wird_verbucht()

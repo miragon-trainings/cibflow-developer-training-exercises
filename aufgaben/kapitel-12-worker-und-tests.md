@@ -35,7 +35,7 @@ Im Startstand tragen diese Dateien Kommentare `TODO Kapitel 12, Schritt ...`. Si
 | 4 | `worker/tests/GenehmigungWorker.Tests/GenehmigungsworkflowTests.cs` | Prozesstest und Gegenprobe mit `Skip` |
 | 5 | `prozesstest-java/src/test/java/io/miragon/schulung/genehmigung/GenehmigungsworkflowTest.java` | Happy Path fertig, Ablehnung, Nachbesserung und Timer mit `@Disabled` |
 
-Fertig vorgegeben sind `Fachsystem/IBuchungssystem.cs` (die Signatur von `Verbuchen`), `ExternalTaskClient.cs` aus Übung 8 und der Test-Helfer `worker/tests/GenehmigungWorker.Tests/EngineHelfer.cs`, im Prozesstest `_engine`. Alle TODOs findet ihr in VS Code mit Strg+Umschalt+F (macOS: Cmd+Umschalt+F) und dem Suchtext `TODO Kapitel 12`.
+Fertig vorgegeben sind `Fachsystem/IBuchungssystem.cs` (die Signatur von `Verbuchen`), `ExternalTaskClient.cs` aus Übung 8 und der Test-Helfer `worker/tests/GenehmigungWorker.Tests/EngineHelper.cs`, im Prozesstest `_engine`. Alle TODOs findet ihr in VS Code mit Strg+Umschalt+F (macOS: Cmd+Umschalt+F) und dem Suchtext `TODO Kapitel 12`.
 
 `dotnet test` im Ordner `worker/` meldet im Startstand 3 übersprungene Tests und keinen Fehler. `./mvnw test` im Ordner `prozesstest-java/` meldet 1 bestandenen und 3 übersprungene Tests: `[WARNING] Tests run: 4, Failures: 0, Errors: 0, Skipped: 3`. Das `[WARNING]` kommt von den übersprungenen Tests und ist kein Fehler.
 
@@ -536,7 +536,7 @@ worker/
     ├── GenehmigungVerbuchenHandlerTests.cs  # Unit-Test für den Handler, ohne Engine
     ├── BuchungssystemFake.cs                # Fake statt Fachsystem
     ├── GenehmigungsworkflowTests.cs         # Prozesstest per REST gegen eure lokale Engine
-    └── EngineHelfer.cs                      # Test-Helfer für den Prozesstest, fertig vorgegeben
+    └── EngineHelper.cs                      # Test-Helfer für den Prozesstest, fertig vorgegeben
 prozesstest-java/
 ├── pom.xml                                  # Engine im Speicher, cibseven-bpm-junit5, cibseven-bpm-assert, bpmn-to-code, Process Test Coverage
 ├── mvnw, mvnw.cmd                           # Maven Wrapper, lädt Maven beim ersten Lauf
@@ -576,7 +576,7 @@ Die Unit-Tests brauchen weder Engine noch Zugangsdaten und laufen in Millisekund
 
 Der Prozesstest in Java braucht weder Stack noch Zugangsdaten noch einen gestoppten Worker: `cibseven-bpm-junit5` startet für die Testklasse eine Engine mit H2 im Speicher und deployt für jeden Testfall die Kopie des Modells aus `src/main/resources/`. Einen Job Executor hat diese Engine nicht, Speicherpunkte und Timer stößt der Test selbst an.
 
-Den Test-Helfer `EngineHelfer.cs` (im Test `_engine`) bekommt ihr fertig: je Methode ein REST-Endpunkt, etwa `StartAsync`, `GetTaskAsync`, `CompleteTaskAsync`, `FetchAndLockAsync`, `CompleteAsync`, `GetHistoryAsync`, `GetVariableAsync` und für die Gegenprobe `GetExternalTasksAsync`. Die lesenden Methoden warten auf den Zustand, statt nur einmal zu fragen: `GetTaskAsync` fragt bis zu zehn Sekunden lang nach, bis die Aufgabe da ist. `GetHistoryAsync`, `GetVariableAsync` und `GetExternalTasksAsync` warten vorher, bis an der Instanz kein Speicherpunkt mehr aussteht. Das braucht euer Modell: Der easyForm-Baustein setzt nach dem Start-Event, nach „Antrag prüfen“ und nach „Antrag nachbessern“ je einen Speicherpunkt, die Engine antwortet dort schon, und den Rest führt ihr Job Executor kurz danach im Hintergrund aus. Kommt der Zustand nicht, nennt die Fehlermeldung, was erwartet war und wo die Instanz steht. `FetchAndLockAsync` fragt bis zu 45 Sekunden lang nach, statt nach einem leeren fetchAndLock sofort aufzugeben: Die letzte Long-Polling-Anfrage eines eben gestoppten Workers bleibt in der Engine bis zu zehn Sekunden offen und kann den Task des Tests noch für 30 Sekunden sperren.
+Den Test-Helfer `EngineHelper.cs` (im Test `_engine`) bekommt ihr fertig: je Methode ein REST-Endpunkt, etwa `StartAsync`, `GetTaskAsync`, `CompleteTaskAsync`, `FetchAndLockAsync`, `CompleteAsync`, `GetHistoryAsync`, `GetVariableAsync` und für die Gegenprobe `GetExternalTasksAsync`. Die lesenden Methoden warten auf den Zustand, statt nur einmal zu fragen: `GetTaskAsync` fragt bis zu zehn Sekunden lang nach, bis die Aufgabe da ist. `GetHistoryAsync`, `GetVariableAsync` und `GetExternalTasksAsync` warten vorher, bis an der Instanz kein Speicherpunkt mehr aussteht. Das braucht euer Modell: Der easyForm-Baustein setzt nach dem Start-Event, nach „Antrag prüfen“ und nach „Antrag nachbessern“ je einen Speicherpunkt, die Engine antwortet dort schon, und den Rest führt ihr Job Executor kurz danach im Hintergrund aus. Kommt der Zustand nicht, nennt die Fehlermeldung, was erwartet war und wo die Instanz steht. `FetchAndLockAsync` fragt bis zu 45 Sekunden lang nach, statt nach einem leeren fetchAndLock sofort aufzugeben: Die letzte Long-Polling-Anfrage eines eben gestoppten Workers bleibt in der Engine bis zu zehn Sekunden offen und kann den Task des Tests noch für 30 Sekunden sperren.
 
 ### Entscheidungen, wo die Folien offen sind
 
