@@ -1,7 +1,7 @@
 // Außen am Sechseck, ausgehender (getriebener) Adapter: Der Kern treibt ihn über den Port IBuchungssystem.
 // Er erfüllt den Port mit einer Technik, hier einer JSON-Datei statt einer echten Anbindung.
 // Kommt das echte Fachsystem, ersetzt ein neuer Adapter diese Datei, Domäne und Engine-Adapter bleiben.
-// Verhalten, Meldungen und Logzeilen sind dieselben wie in loesung/worker, nur Verbuchen nimmt eine Genehmigung.
+// Verhalten, Meldungen und Logzeilen sind dieselben wie in worker/, nur Verbuchen nimmt eine Genehmigung.
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -98,7 +98,7 @@ public class BuchungssystemSimulation : IBuchungssystem
 
     /// <summary>
     /// Eine Buchung, so wie sie in der Datei steht. Das Dateiformat gehört dem Adapter, nicht der Domäne,
-    /// es ist dasselbe wie in loesung/worker.
+    /// es ist dasselbe wie in worker/.
     /// </summary>
     public record Buchung(
         string Buchungsnummer,

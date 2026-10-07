@@ -4,7 +4,7 @@
 namespace GenehmigungWorker.Tests;
 
 /// <summary>
-/// Prozesstest zum Bonus fachlicher Fehler, gegen die Variante prozess/varianten/verbuchen-fehlerpfad.bpmn.
+/// Prozesstest zum fachlichen Fehler, gegen die Variante prozess/varianten/verbuchen-fehlerpfad.bpmn.
 /// Die Variante spielt der Test selbst ein. Sonst gilt dasselbe wie für die anderen Prozesstests:
 /// Stack läuft, Zugangsdaten gesetzt, euer Worker ist gestoppt.
 /// </summary>

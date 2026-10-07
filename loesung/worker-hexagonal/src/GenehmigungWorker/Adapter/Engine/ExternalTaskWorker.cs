@@ -2,7 +2,7 @@
 // Sie holt Tasks per ExternalTaskClient, gibt jeden an den GenehmigungVerbuchenAdapter und meldet das
 // Ergebnis an die Engine zurück: complete, failure mit Retries oder bpmnError. Retries, Incidents und
 // errorCodes sind Begriffe der Engine und des Modells, deshalb stehen sie hier und nicht in der Domäne.
-// In loesung/worker steht dieselbe Schleife in Program.cs, mit denselben Logzeilen.
+// In worker/ steht dieselbe Schleife in Program.cs, mit denselben Logzeilen.
 using GenehmigungWorker.Domaene;
 
 namespace GenehmigungWorker.Adapter.Engine;

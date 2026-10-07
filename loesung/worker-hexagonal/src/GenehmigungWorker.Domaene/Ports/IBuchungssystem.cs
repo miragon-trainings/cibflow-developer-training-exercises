@@ -1,7 +1,7 @@
 // Rand der Mitte, ausgehender Port: Das braucht der Kern von außen, beschrieben mit seinen eigenen Worten.
 // Die Domäne besitzt dieses Interface, ein Adapter erfüllt es: im Worker die Simulation
 // (Adapter/Fachsystem/BuchungssystemSimulation.cs), im Unit-Test ein Fake, später das echte Fachsystem.
-// Anders als in loesung/worker nimmt Verbuchen ein Domänenobjekt statt vier einzelner Werte.
+// Anders als in worker/ nimmt Verbuchen ein Domänenobjekt statt vier einzelner Werte.
 namespace GenehmigungWorker.Domaene.Ports;
 
 /// <summary>

@@ -1,4 +1,4 @@
-# Musterlösung zu Übung 9, hexagonal geschnitten
+# Der fertige Worker, hexagonal geschnitten
 
 Derselbe Worker wie in [`worker/`](../../worker/), nach Ports und Adaptern geschnitten. Er tut genau dasselbe: gleiche Logzeilen, gleiche Variablen, gleicher Idempotenz-Schlüssel (Business Key, sonst Prozessinstanz-ID), gleiche Fehlerbehandlung mit `complete`, `failure` und `bpmnError`. Anders ist nur, wo welcher Code liegt: Die Fachlogik steht in einem eigenen Projekt, das die Engine nie kennt.
 

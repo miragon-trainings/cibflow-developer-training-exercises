@@ -97,6 +97,7 @@ Content-Type: application/json
 
 ### 6. External Task holen und sperren (fetchAndLock) als worker
 # Die Antwort ist ein Array. Leer heißt: Auf dem Topic liegt gerade nichts.
+# Läuft euer Worker, holt und verbucht er den Task vorher: Stoppt ihn mit Strg+C und wartet gut zehn Sekunden.
 # Direkt nach Schritt 5 kann das auch am Speicherpunkt nach "Antrag prüfen" liegen: noch einmal senden.
 # Warten noch ältere genehmigte Anträge, holt fetchAndLock vielleicht einen davon.
 # Die Schritte 7 bis 9 arbeiten deshalb mit dem Task und der Instanz aus dieser Antwort.

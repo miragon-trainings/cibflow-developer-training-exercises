@@ -280,8 +280,7 @@ public sealed class EngineHelper : IDisposable
             throw new HttpRequestException(
                 $"Die Engine unter {_http.BaseAddress} antwortet nicht ({fehler.Message}). " +
                 "Läuft der Stack? Im Ordner stack/: docker compose up -d, dann warten, bis " +
-                "docker compose logs init mit \"[init] Fertig.\" endet. Nur die Unit-Tests ohne Engine: " +
-                "dotnet test --filter \"Kategorie!=Prozesstest\"",
+                "docker compose logs init mit \"[init] Fertig.\" endet.",
                 fehler);
         }
 

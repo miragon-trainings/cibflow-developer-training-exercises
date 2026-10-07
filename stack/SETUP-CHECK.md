@@ -1,6 +1,6 @@
 # Setup-Check
 
-Prüft in fünf Schritten, ob das Übungs-Repo auf einem Rechner läuft: Worker und Java-Projekte, CIB flow, Worker und der Prozesstest in C#. Jeder Schritt nennt, was ihr sehen müsst.
+Prüft in fünf Schritten, ob das Übungs-Repo auf einem Rechner läuft: Worker und Java-Projekte, CIB flow, Smoke-Test, Worker gegen den Stack und der Prozesstest in C#. Jeder Schritt nennt, was ihr sehen müsst.
 
 Ihr braucht Docker Desktop mit 8 GB Speicher, .NET SDK 10, JDK 21, Git und die Zugangsdaten für `harbor.cib.de`. Details stehen in der [README](README.md#voraussetzungen).
 

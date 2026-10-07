@@ -81,7 +81,7 @@ Die Schritte stehen in der Übungsanleitung eurer Schulung. Die Blätter unter `
 
 ## Was wo liegt
 
-Den Worker in C# bekommt ihr fertig unter `worker/`: Ihr startet ihn und tragt nur euren `ProzessKey` in `appsettings.json` ein. Eure Prozesstests in Java schreibt ihr unter `prozesstest-java/`. Unter `loesung/` liegen die fertigen Prozesstests in Java, das umgebaute Modell und das Element Template, dazu der Worker noch einmal nach Ports und Adaptern geschnitten. Wie ihr sie baut und mit eurem Stand vergleicht, steht in [loesung/README.md](loesung/README.md).
+Den Worker in C# bekommt ihr fertig unter `worker/`: Am Code ändert ihr nichts, ihr tragt euren `ProzessKey` in `appsettings.json` ein, setzt die Zugangsdaten als User Secrets und startet ihn. Eure Prozesstests in Java schreibt ihr unter `prozesstest-java/`. Unter `loesung/` liegen die fertigen Prozesstests in Java, das umgebaute Modell und das Element Template, dazu der Worker noch einmal nach Ports und Adaptern geschnitten. Wie ihr sie baut und mit eurem Stand vergleicht, steht in [loesung/README.md](loesung/README.md).
 
 ```
 cibflow-developer-training-exercises/
@@ -118,7 +118,7 @@ cibflow-developer-training-exercises/
 
 ## Für Trainer
 
-Ob das Repo auf einem Rechner läuft, prüft ihr in fünf Schritten mit dem [Setup-Check](stack/SETUP-CHECK.md): Worker und Java-Projekte, CIB flow, Worker gegen den Stack und der Prozesstest in C#.
+Ob das Repo auf einem Rechner läuft, prüft ihr in fünf Schritten mit dem [Setup-Check](stack/SETUP-CHECK.md): Worker und Java-Projekte, CIB flow, Smoke-Test, Worker gegen den Stack und der Prozesstest in C#.
 
 `stack/smoke-test.sh` prüft einen laufenden Stack per REST, mit allen drei Pfaden. Aufruf im Ordner `stack/` mit `./smoke-test.sh`, unter Windows in Git Bash mit `bash smoke-test.sh`. Stoppt vorher einen laufenden Worker. Mit `ENGINE_URL`, `PROZESS_KEY` und `BPMN` richtet ihr es auf eine andere Engine oder ein anderes Modell. Der Smoke-Test spielt die Entwickler-Fassung `loesung/genehmigungsworkflow-entwickler.bpmn` ein, danach ist sie die neueste Version in der Engine. Zeigt ihr auf diesem Rechner danach Übung 8, setzt ihr den Stack im Ordner `stack/` mit `docker compose down -v` zurück und importiert das Projekt-ZIP neu: Der Smoke-Test hat „Genehmigung verbuchen“ schon als External Task eingespielt.
 

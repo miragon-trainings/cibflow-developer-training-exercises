@@ -1,6 +1,6 @@
 // Testseite, ausgehender Adapter: Unit-Tests für die Simulation des Fachsystems, ohne Engine.
 // Sie prüfen, dass der Adapter den Vertrag des Ports IBuchungssystem erfüllt: idempotent je Schlüssel,
-// fachliche Ablehnung über dem Budget. In loesung/worker stehen dieselben Tests in GenehmigungVerbuchenHandlerTests.cs.
+// fachliche Ablehnung über dem Budget.
 namespace GenehmigungWorker.Tests;
 
 /// <summary>
